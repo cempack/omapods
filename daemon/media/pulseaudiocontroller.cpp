@@ -6,6 +6,7 @@
 #include <QElapsedTimer>
 #include <QThread>
 #include <algorithm>
+#include <pulse/timeval.h>
 
 namespace
 {
