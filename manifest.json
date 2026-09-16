@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "io.github.thisisgm.omapods",
-  "name": "AirPods",
-  "version": "1.3.6",
-  "author": "GM",
+  "id": "io.github.cempack.omapods",
+  "name": "OmaPods",
+  "version": "1.3.7",
+  "author": "Elliot Moreau",
   "license": "MIT",
-  "description": "AirPods in the Omarchy bar: per-pod and case battery, listening mode, adaptive noise level, conversation awareness, one-bud ANC and ear detection.",
+  "description": "AirPods in the Omarchy bar. Idle BLE discovery is duty-cycled so other LE HID devices can still reconnect.",
   "kinds": [
     "bar-widget"
   ],

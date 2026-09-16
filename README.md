@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://omarchyplugins.com/plugin.html?id=io.github.thisisgm.omapods"><img alt="On omarchyplugins.com" src="https://img.shields.io/badge/omarchyplugins.com-listed-8b5cf6"></a>
-  <a href="https://github.com/thisisgm/omarchy-pods/tags"><img alt="Latest tag" src="https://img.shields.io/github/v/tag/thisisgm/omarchy-pods?label=version"></a>
+  <a href="https://omarchyplugins.com/plugin.html?id=io.github.cempack.omapods"><img alt="On omarchyplugins.com" src="https://img.shields.io/badge/omarchyplugins.com-omapods-8b5cf6"></a>
+  <a href="https://github.com/cempack/omapods/tags"><img alt="Latest tag" src="https://img.shields.io/github/v/tag/cempack/omapods?label=version"></a>
 </p>
 
 <p align="center">
@@ -31,10 +31,21 @@
 - **Case lid**, when the case has broadcast its state. Lid state comes from BLE
   advertisements, and the daemon pauses that discovery while the control link is
   up, because discovery running alongside a live link is what the crackle in issue
-  26 tracks. So lid state holds its last value for as long as the pods stay
+  26 tracks. While the pods are away, discovery runs in 2s bursts with 8s gaps so
+  other bonded LE HID devices (a mouse, a keyboard) can still auto-reconnect.
+  So lid state holds its last value for as long as the pods stay
   connected, and the case level may keep refreshing over the control link, as it
   does here, or hold like the lid, as the issue 26 reporter saw. Per-pod battery, ANC and ear detection keep updating
   throughout.
+
+## Why this fork
+
+This is a fork of [thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods)
+with one behaviour change: idle BLE discovery is duty-cycled instead of held
+open forever. Upstream issue
+[#44](https://github.com/thisisgm/omarchy-pods/issues/44) is the same defect.
+The PR back to upstream is
+[#60](https://github.com/thisisgm/omarchy-pods/pull/60).
 - **A mark that matches the hardware**: stemmed buds, AirPods Pro or AirPods Max,
   chosen from the model the daemon reports. AirPods Max carry no case, so their
   panel drops the case row and shows a single headphone battery.
@@ -148,13 +159,17 @@ of writing. Nothing in this daemon does that today.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/thisisgm/omarchy-pods --enable
-~/.config/omarchy/plugins/io.github.thisisgm.omapods/setup
+omarchy plugin add https://github.com/cempack/omapods.git --enable
+~/.config/omarchy/plugins/io.github.cempack.omapods/setup
 ```
 
 `--enable` already places the widget on the right of the bar. The
-[marketplace listing](https://omarchyplugins.com/plugin.html?id=io.github.thisisgm.omapods)
+[marketplace listing](https://omarchyplugins.com/plugin.html?id=io.github.cempack.omapods)
 installs to the same place.
+
+If you already have `io.github.thisisgm.omapods` installed, remove it first.
+The two plugins share the same daemon unit (`librepods.service`) and must not
+run together.
 
 `setup` installs `cmake`, `ninja`, `qt6-connectivity`, `qt6-tools`,
 `qt6-declarative`, `pkgconf` and `libpulse` if they are missing, builds the
@@ -162,14 +177,14 @@ daemon into `~/.local`, and enables `librepods.service`. The icon stays hidden
 until AirPods are connected (`hideWhenDisconnected`). To keep it visible:
 
 ```bash
-omarchy bar set io.github.thisisgm.omapods hideWhenDisconnected false --json
+omarchy bar set io.github.cempack.omapods hideWhenDisconnected false --json
 ```
 
 To build the daemon by hand instead of running `setup`:
 
 ```bash
 omarchy pkg add cmake ninja qt6-connectivity qt6-tools qt6-declarative pkgconf libpulse
-cd ~/.config/omarchy/plugins/io.github.thisisgm.omapods/daemon
+cd ~/.config/omarchy/plugins/io.github.cempack.omapods/daemon
 cmake -B build -G Ninja -DBUILD_TESTING=OFF && cmake --build build
 cmake --install build --prefix ~/.local
 systemctl --user daemon-reload
@@ -186,9 +201,9 @@ which is where the panel finds `librepods-ctl`. The unit is bound to
 
 ```bash
 systemctl --user disable --now librepods.service
-xargs rm -f < ~/.config/omarchy/plugins/io.github.thisisgm.omapods/daemon/build/install_manifest.txt
+xargs rm -f < ~/.config/omarchy/plugins/io.github.cempack.omapods/daemon/build/install_manifest.txt
 rm -rf ~/.config/AirPodsTrayApp ~/.local/state/librepods
-omarchy plugin remove io.github.thisisgm.omapods
+omarchy plugin remove io.github.cempack.omapods
 ```
 
 The daemon installs into `~/.local`, so it outlives the plugin. CMake lists what it
@@ -251,6 +266,9 @@ covers the build, what review will ask you to prove, and the house style;
 [AGENTS.md](AGENTS.md) adds the traps coding agents hit in this tree.
 
 ## Credits
+
+The panel and daemon packaging are from
+[thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods) by **GM**.
 
 The hard part is not this panel. It is
 [librepods](https://github.com/kavishdevar/librepods) by **Kavish Devar**, which
