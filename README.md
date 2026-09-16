@@ -1,12 +1,15 @@
-<h1 align="center">AirPods for Omarchy</h1>
+<h1 align="center">OmaPods</h1>
 
 <p align="center">
-  Battery for each pod and the case, the listening modes, adaptive noise level, Conversation Awareness, One-Bud ANC and ear detection, drawn in Omarchy's own panel idiom.
+  A maintained version of OmaPods.
+  Battery for each pod and the case, the listening modes, adaptive noise level,
+  Conversation Awareness, One-Bud ANC and ear detection, drawn in Omarchy's own
+  panel idiom.
 </p>
 
-AirPods remain fully supported, and Powerbeats Pro and Powerbeats Pro 2 use the
-same battery, listening-mode and ear-detection panel with their own ear-hook
-mark.
+Same plugin as upstream, kept current. AirPods remain fully supported, and
+Powerbeats Pro and Powerbeats Pro 2 use the same battery, listening-mode and
+ear-detection panel with their own ear-hook mark.
 
 <p align="center">
   <a href="https://omarchyplugins.com/plugin.html?id=io.github.cempack.omapods"><img alt="On omarchyplugins.com" src="https://img.shields.io/badge/omarchyplugins.com-omapods-8b5cf6"></a>
@@ -46,14 +49,16 @@ mark.
   no case, so their panel drops the case row and shows a single headphone
   battery.
 
-## Why this fork
+## A maintained OmaPods
 
-This is a fork of [thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods).
-Idle BLE discovery is duty-cycled instead of held open forever (upstream
-[#44](https://github.com/thisisgm/omarchy-pods/issues/44), PR
-[#60](https://github.com/thisisgm/omarchy-pods/pull/60)). It also carries the
-open upstream fixes for PulseAudio reconnect, the Max watchdog, Pro 3 Off,
-headset ear-detection labels, Powerbeats Pro, and conversation-awareness volume.
+This is [thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods), kept
+current: idle BLE discovery is duty-cycled instead of held open forever
+(upstream [#44](https://github.com/thisisgm/omarchy-pods/issues/44), PR
+[#60](https://github.com/thisisgm/omarchy-pods/pull/60)), plus the open upstream
+fixes for PulseAudio reconnect, the Max watchdog, Pro 3 Off, headset
+ear-detection labels, Powerbeats Pro, and conversation-awareness volume.
+
+Install this listing or the original, not both. They share `librepods.service`.
 
 ## Deliberately absent
 
