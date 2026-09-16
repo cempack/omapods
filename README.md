@@ -4,6 +4,10 @@
   Battery for each pod and the case, the listening modes, adaptive noise level, Conversation Awareness, One-Bud ANC and ear detection, drawn in Omarchy's own panel idiom.
 </p>
 
+AirPods remain fully supported, and Powerbeats Pro and Powerbeats Pro 2 use the
+same battery, listening-mode and ear-detection panel with their own ear-hook
+mark.
+
 <p align="center">
   <a href="https://omarchyplugins.com/plugin.html?id=io.github.cempack.omapods"><img alt="On omarchyplugins.com" src="https://img.shields.io/badge/omarchyplugins.com-omapods-8b5cf6"></a>
   <a href="https://github.com/cempack/omapods/tags"><img alt="Latest tag" src="https://img.shields.io/github/v/tag/cempack/omapods?label=version"></a>
@@ -19,9 +23,9 @@
   and in-ear hint. Nothing else on a Linux box knows these numbers: BlueZ does
   not expose `org.bluez.Battery1` for AirPods.
 - **Listening mode**, and only the modes the device actually has. AirPods 1, 2, 3
-  and the plain AirPods 4 get no section at all, AirPods Pro 3 dropped Off, and
-  Adaptive needs an H2 part that also has noise cancellation, so the panel asks
-  the daemon rather than assuming four rows.
+  and the plain AirPods 4 get no section at all, and Adaptive needs an H2 part
+  that also has noise cancellation, so the panel asks the daemon rather than
+  assuming four rows.
 - **Adaptive noise level**, shown only while Adaptive is the active mode.
 - **Conversation Awareness** on the same models that have Adaptive, and
   **One-Bud ANC** on the ones with a second bud, which is why an AirPods Max 2
@@ -37,18 +41,19 @@
   connected, and the case level may keep refreshing over the control link, as it
   does here, or hold like the lid, as the issue 26 reporter saw. Per-pod battery, ANC and ear detection keep updating
   throughout.
+- **A mark that matches the hardware**: stemmed buds, AirPods Pro, AirPods Max
+  or Powerbeats Pro, chosen from the model the daemon reports. AirPods Max carry
+  no case, so their panel drops the case row and shows a single headphone
+  battery.
 
 ## Why this fork
 
-This is a fork of [thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods)
-with one behaviour change: idle BLE discovery is duty-cycled instead of held
-open forever. Upstream issue
-[#44](https://github.com/thisisgm/omarchy-pods/issues/44) is the same defect.
-The PR back to upstream is
-[#60](https://github.com/thisisgm/omarchy-pods/pull/60).
-- **A mark that matches the hardware**: stemmed buds, AirPods Pro or AirPods Max,
-  chosen from the model the daemon reports. AirPods Max carry no case, so their
-  panel drops the case row and shows a single headphone battery.
+This is a fork of [thisisgm/omarchy-pods](https://github.com/thisisgm/omarchy-pods).
+Idle BLE discovery is duty-cycled instead of held open forever (upstream
+[#44](https://github.com/thisisgm/omarchy-pods/issues/44), PR
+[#60](https://github.com/thisisgm/omarchy-pods/pull/60)). It also carries the
+open upstream fixes for PulseAudio reconnect, the Max watchdog, Pro 3 Off,
+headset ear-detection labels, Powerbeats Pro, and conversation-awareness volume.
 
 ## Deliberately absent
 
@@ -70,7 +75,7 @@ configured differently between them.
 
 | | | |
 |:---:|:---:|:---:|
-| <img src="docs/panel-model-airpods4.png" alt="AirPods 4 with ANC"><br>**AirPods 4 with ANC**<br>all four modes, and One-Bud ANC to hold them with one pod in | <img src="docs/panel-model-pro3.png" alt="AirPods Pro 3"><br>**AirPods Pro 3**<br>no Off row: the Pro 3 dropped it | <img src="docs/panel-model-max2.png" alt="AirPods Max 2"><br>**AirPods Max 2**<br>one battery, no case, and no One-Bud ANC to offer |
+| <img src="docs/panel-model-airpods4.png" alt="AirPods 4 with ANC"><br>**AirPods 4 with ANC**<br>all four modes, and One-Bud ANC to hold them with one pod in | <img src="docs/panel-model-pro3.png" alt="AirPods Pro 3"><br>**AirPods Pro 3**<br>current firmware has Off; older firmware ignored the packet | <img src="docs/panel-model-max2.png" alt="AirPods Max 2"><br>**AirPods Max 2**<br>one battery, no case, and no One-Bud ANC to offer |
 
 Both AirPods 4 variants say **AirPods 4** in the title, because the name is the
 family and the rows underneath are what the unit can actually do. The plain
@@ -97,10 +102,12 @@ anyway. It works because the panel reads that file and nothing else.
   `ca:`, `onebud:` or `adaptive:` verbs, and a model map that stops before
   AirPods Pro 3, so the panel would stay hidden forever. The copy here carries
   every model number Apple lists as of August 2026, up to the 2026 AirPods
-  Max 2, and what each of those models can actually do. See [daemon/UPSTREAM.md](daemon/UPSTREAM.md)
+  Max 2, plus both Powerbeats Pro generations, and what each of those models can
+  actually do. See [daemon/UPSTREAM.md](daemon/UPSTREAM.md)
   for what it is, who wrote it and what was changed. `omarchy plugin add` only
   clones the plugin; `setup` builds the daemon.
-- AirPods paired to the machine through the usual Bluetooth flow.
+- AirPods or Powerbeats Pro paired to the machine through the usual Bluetooth
+  flow.
 
 ## How it works
 
