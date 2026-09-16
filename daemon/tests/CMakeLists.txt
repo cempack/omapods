@@ -87,6 +87,12 @@ openpods_add_test(tst_snaptogrid
     ../snaptogrid.hpp
 )
 
+openpods_add_test(tst_conversationalawareness
+    tst_conversationalawareness.cpp
+    ../airpods_packets.h
+    ../media/conversationvolume.hpp
+)
+
 openpods_add_test(tst_ipcverb
     tst_ipcverb.cpp
     ../ipcverb.hpp
