@@ -10,6 +10,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(PULSEAUDIO REQUIRED libpulse)
 
 qt_standard_project_setup()
+qt_policy(SET QTP0001 NEW)
 
 # Translation files
 set(TS_FILES
@@ -57,6 +58,7 @@ set_source_files_properties(Theme.qml PROPERTIES
 qt_add_qml_module(librepods
     URI linux
     VERSION 1.0
+    RESOURCE_PREFIX /
     QML_FILES
         Main.qml
         BatteryIndicator.qml
