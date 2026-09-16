@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDBusObjectPath>
 #include <QDBusMetaType>
+#include <QDBusPendingCallWatcher>
 
 // bluetoothd answers this sweep in milliseconds, and the watchdog repeats it, so a wedged
 // bluetoothd must not hold the event loop for the 25 s D-Bus default on every tick.

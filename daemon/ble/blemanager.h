@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QBluetoothDeviceDiscoveryAgent>
+#include <QBluetoothLocalDevice>
 #include <QMap>
 #include <QString>
 #include <QDateTime>
@@ -81,6 +82,7 @@ private slots:
     void onWindowTimeout();
     void onIdleFinished();
     void onErrorOccurred(QBluetoothDeviceDiscoveryAgent::Error error);
+    void onHostModeChanged(QBluetoothLocalDevice::HostMode mode);
 
 signals:
     void deviceFound(const BleInfo &device);
@@ -88,15 +90,20 @@ signals:
 private:
     void openScanWindow();
     void closeScanWindow();
+    void restartAgentAfterAdapterPower();
 
     // Default-init so a partial construction (or a refactor that
     // skips the explicit ctor body) doesn't leave a dangling pointer
     // that start/stop/isScan would dereference. Real assignment
     // happens in BleManager::BleManager() via parented `new`.
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
+    QBluetoothLocalDevice *localDevice = nullptr;
     QTimer *windowTimer = nullptr;
     QTimer *idleTimer = nullptr;
     ScanDuty::Cycle duty;
+    // stop() then start() for a wedged agent emits canceled after we already
+    // opened the new window, so that late signal must not start an idle gap.
+    bool restartingAgent = false;
 };
 
 #endif // BLEMANAGER_H

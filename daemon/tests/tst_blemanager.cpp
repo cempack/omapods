@@ -1,6 +1,8 @@
 #include <QtTest>
 #include <QBluetoothAddress>
+#include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
+#include <QBluetoothLocalDevice>
 
 #include "../ble/blemanager.h"
 
@@ -80,6 +82,8 @@ private slots:
     void powerBeatsProFrameIsRecognized();
     void powerBeatsPro2FrameIsRecognized();
     void podsBatteryKeepsLeftAndRightApart();
+    void scanErrorKeepsTheScanRequested();
+    void adapterPowerOnRestartsAWantedScan();
 };
 
 void TestBleManager::unparseableFrameIsDropped_data()
@@ -142,6 +146,46 @@ void TestBleManager::podsBatteryKeepsLeftAndRightApart()
     QCOMPARE(parseFrame(withRightPodPrimary(unequalPods), &parsed), 1);
     QCOMPARE(parsed.leftPodBattery, 80);
     QCOMPARE(parsed.rightPodBattery, 20);
+}
+
+void TestBleManager::scanErrorKeepsTheScanRequested()
+{
+    BleManager manager;
+    manager.startScan();
+    QVERIFY(manager.isScanning());
+
+    QVERIFY(QMetaObject::invokeMethod(&manager, "onErrorOccurred", Qt::DirectConnection,
+                                      Q_ARG(QBluetoothDeviceDiscoveryAgent::Error,
+                                            QBluetoothDeviceDiscoveryAgent::PoweredOffError)));
+    // The old handler called stopScan(), which killed discovery for the life of the process.
+    QVERIFY(manager.isScanning());
+
+    manager.stopScan();
+    QVERIFY(!manager.isScanning());
+    QVERIFY(QMetaObject::invokeMethod(&manager, "onErrorOccurred", Qt::DirectConnection,
+                                      Q_ARG(QBluetoothDeviceDiscoveryAgent::Error,
+                                            QBluetoothDeviceDiscoveryAgent::PoweredOffError)));
+    QVERIFY(!manager.isScanning());
+}
+
+void TestBleManager::adapterPowerOnRestartsAWantedScan()
+{
+    BleManager manager;
+    manager.startScan();
+    QVERIFY(manager.isScanning());
+
+    QVERIFY(QMetaObject::invokeMethod(&manager, "onHostModeChanged", Qt::DirectConnection,
+                                      Q_ARG(QBluetoothLocalDevice::HostMode,
+                                            QBluetoothLocalDevice::HostConnectable)));
+    QTRY_VERIFY(manager.isScanning());
+
+    manager.stopScan();
+    QVERIFY(!manager.isScanning());
+    QVERIFY(QMetaObject::invokeMethod(&manager, "onHostModeChanged", Qt::DirectConnection,
+                                      Q_ARG(QBluetoothLocalDevice::HostMode,
+                                            QBluetoothLocalDevice::HostConnectable)));
+    QTest::qWait(20);
+    QVERIFY(!manager.isScanning());
 }
 
 QTEST_GUILESS_MAIN(TestBleManager)

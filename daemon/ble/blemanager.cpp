@@ -113,6 +113,10 @@ BleManager::BleManager(QObject *parent) : QObject(parent)
             this, &BleManager::onScanFinished);
     connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::errorOccurred,
             this, &BleManager::onErrorOccurred);
+
+    localDevice = new QBluetoothLocalDevice(this);
+    connect(localDevice, &QBluetoothLocalDevice::hostModeStateChanged,
+            this, &BleManager::onHostModeChanged);
 }
 
 BleManager::~BleManager()
@@ -267,6 +271,9 @@ void BleManager::onDeviceDiscovered(const QBluetoothDeviceInfo &info)
 
 void BleManager::onScanFinished()
 {
+    if (restartingAgent) {
+        return;
+    }
     closeScanWindow();
 }
 
@@ -286,5 +293,35 @@ void BleManager::onIdleFinished()
 void BleManager::onErrorOccurred(QBluetoothDeviceDiscoveryAgent::Error error)
 {
     LOG_ERROR("BLE scan error occurred:" << error);
+    if (restartingAgent) {
+        return;
+    }
     closeScanWindow();
+}
+
+void BleManager::onHostModeChanged(QBluetoothLocalDevice::HostMode mode)
+{
+    if (mode == QBluetoothLocalDevice::HostPoweredOff || !duty.isRequested()) {
+        return;
+    }
+
+    LOG_INFO("Bluetooth adapter powered on, restarting the BLE scan");
+    idleTimer->stop();
+    duty.request();
+    restartAgentAfterAdapterPower();
+}
+
+void BleManager::restartAgentAfterAdapterPower()
+{
+    // The agent reports isActive after the adapter drops a live scan, and start() is then a no-op.
+    restartingAgent = true;
+    discoveryAgent->stop();
+    QTimer::singleShot(0, this, [this] {
+        restartingAgent = false;
+        if (!duty.isRequested()) {
+            return;
+        }
+        discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+        windowTimer->start(ScanDuty::scanWindowMs);
+    });
 }
