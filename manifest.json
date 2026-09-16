@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.cempack.omapods",
   "name": "OmaPods",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Elliot Moreau",
   "license": "MIT",
   "description": "A maintained OmaPods. AirPods and Powerbeats Pro in the Omarchy bar, with idle BLE discovery duty-cycled so other LE HID devices can still reconnect.",

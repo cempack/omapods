@@ -46,7 +46,7 @@ qt_add_executable(librepods
     media/playerstatuswatcher.h
     systemsleepmonitor.hpp
     controlreconnect.hpp
-    conversationvolume.hpp
+    media/conversationvolume.hpp
     scanduty.hpp
 )
 
